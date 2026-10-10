@@ -178,7 +178,7 @@
     $('importLink').value = url;
     const download = new URL(url); download.searchParams.set('download', '1');
     $('importDownload').href = download.href;
-    $('importDownload').download = app.scheme === 'sing-box' ? 'FOXPANEL-SingBox.json' : 'FOXPANELPanel.txt';
+    $('importDownload').download = app.scheme === 'sing-box' ? 'PANELFOX-SingBox.json' : 'PANELFOXPanel.txt';
     $('importCommand').hidden = reason !== 'linux';
     if (!$('importDialog').open) $('importDialog').showModal();
   }
@@ -349,7 +349,7 @@
     renderChart();
   }));
   function render() {
-    $('subscriptionTitle').textContent = data.title || 'FOXPANEL Panel';
+    $('subscriptionTitle').textContent = data.title || 'PANELFOX Panel';
     $('subscriptionTitle').dir = 'auto';
     $('subscriptionTitle').classList.toggle('account-title',!!data.account);
     $('accountDetails').hidden = !data.account;

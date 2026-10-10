@@ -1,7 +1,7 @@
 {
   "name": "amyrax-panel",
   "version": "1.11.4",
-  "description": "FOXPANEL Panel - multi-protocol proxy and web panel | https://t.me/FOXPANEL",
+  "description": "PANELFOX Panel - multi-protocol proxy and web panel | https://t.me/PANELFOX",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -15,7 +15,7 @@
   "engines": {
     "node": ">=18"
   },
-  "author": "FOXPANEL Panel",
+  "author": "PANELFOX Panel",
   "license": "MIT",
-  "homepage": "https://t.me/FOXPANEL"
+  "homepage": "https://t.me/PANELFOX"
 }

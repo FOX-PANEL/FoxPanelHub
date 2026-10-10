@@ -79,7 +79,7 @@ function createTransportSupport({ Logger }) {
       headers['x-forwarded-proto']='https';
       let upstream;
       let pathname;try{pathname=decodeURIComponent(String(req.url).split('?')[0]);}catch{pathname='';}
-      const isGrpc=String(req.headers['content-type']||'').startsWith('application/grpc') && /^\/Telegram=@FOX PANELVPN\/(?:Tun|TunMulti)$/.test(pathname);
+      const isGrpc=String(req.headers['content-type']||'').startsWith('application/grpc') && /^\/Telegram=@FOX_PANELVPN\/(?:Tun|TunMulti)$/.test(pathname);
       if(isGrpc) {
         const port=config.transportState?.grpc;
         if(!port){res.writeHead(503);res.end();return;}
@@ -123,7 +123,7 @@ function createTransportSupport({ Logger }) {
           if(!variants.some(([,transport,,flag])=>transport===network&&this.config.enable[flag]))continue;
           const server=net.createServer(socket=>{this.sockets.add(socket);socket.once('close',()=>this.sockets.delete(socket));this.gateway.accept(socket,network==='grpc'?'gRPC':'XHTTP');});
           this.servers.push(server);const destination=await listen(server);const port=await freePort();ports[network]=port;
-          inbounds.push({listen:'127.0.0.1',port,protocol:'dokodemo-door',tag:network,settings:{address:'127.0.0.1',port:destination,network:'tcp'},streamSettings:{network,security:'none',...(network==='grpc'?{grpcSettings:{serviceName:'Telegram=@FOX PANELVPN'}}:{xhttpSettings:{path:'/Telegram=@FOX PANELVPN',mode:'auto'}})}});
+          inbounds.push({listen:'127.0.0.1',port,protocol:'dokodemo-door',tag:network,settings:{address:'127.0.0.1',port:destination,network:'tcp'},streamSettings:{network,security:'none',...(network==='grpc'?{grpcSettings:{serviceName:'Telegram=@FOX_PANELVPN'}}:{xhttpSettings:{path:'/Telegram=@FOX_PANELVPN',mode:'auto'}})}});
         }
         if(!inbounds.length)return false;
         this.file=path.join(this.config.paths.dataDir,'transports.json');

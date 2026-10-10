@@ -205,7 +205,7 @@
   document.addEventListener('close', event => {
     if (active && event.target.contains(active.root)) active.close();
   }, true);
-  window.FOX_PANELControls = {
+  window.FOXPANELControls = {
     menu: config => create({ ...config, menu: true }).root,
     sync,
     isOpen: () => !!active,

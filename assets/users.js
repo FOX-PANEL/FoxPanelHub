@@ -6,7 +6,7 @@
   const bytes=n=>amyraxBytes(n);
   const date=n=>n?new Date(n).toLocaleString('fa-IR',{dateStyle:'medium',timeStyle:'short'}):'—';
   async function api(path='',method='GET',body){
-    const data=await amyraxRequestJson(base+path,{method,headers:method==='GET'?{}:{'Content-Type':'application/json','X-FOX_PANEL-Req':'1'},...(body?{body:JSON.stringify(body)}:{})});
+    const data=await amyraxRequestJson(base+path,{method,headers:method==='GET'?{}:{'Content-Type':'application/json','X-FOXPANEL-Req':'1'},...(body?{body:JSON.stringify(body)}:{})});
     if(!data.ok)throw new Error(data.error||'دریافت اطلاعات ناموفق بود.');return data;
   }
   function render(){
@@ -17,7 +17,7 @@
     $('userTotal').textContent=fa.format(users.filter(u=>!u.archivedAt).length);
     $('userActive').textContent=fa.format(users.filter(u=>['active','pending'].includes(u.status)).length);
     $('userLimited').textContent=fa.format(users.filter(u=>['expired','limited'].includes(u.status)).length);
-    FOX_PANELControls.close();
+    FOXPANELControls.close();
     $('usersList').replaceChildren();
     for(const u of shown){
       const card=node('article','user-card');const head=node('div','user-card-head');const name=node('div','user-name');
@@ -33,7 +33,7 @@
       const button=(label,action)=>{const b=node('button','button secondary',label);b.type='button';b.addEventListener('click',action);return b;};
       buttons.append(button('ویرایش',()=>openEditor(u)),button('کپی ساب',()=>copyTextToClipboard(u.subscriptionUrl)),button('QR',()=>openQr(u.subscriptionUrl,u.name)));
       const link=node('a','button secondary','صفحهٔ اشتراک ↗');link.href=u.subscriptionUrl;link.target='_blank';link.rel='noopener noreferrer';buttons.append(link);card.append(buttons);
-      const actions=FOX_PANELControls.menu({label:'عملیات بیشتر',ariaLabel:'عملیات '+u.name,className:'user-actions',
+      const actions=FOXPANELControls.menu({label:'عملیات بیشتر',ariaLabel:'عملیات '+u.name,className:'user-actions',
         options:()=>[['toggle',u.enabled?'غیرفعال کردن':'فعال کردن'],['renew','تمدید اعتبار'],['reset','بازنشانی مصرف'],['disconnect','قطع اتصال‌های فعلی'],['rotate-link','تعویض لینک ساب'],['rotate-credentials','تعویض مشخصات اتصال'],[u.archivedAt?'restore':'archive',u.archivedAt?'بازیابی کاربر':'بایگانی کاربر'],['delete','حذف دائمی کاربر']].map(([value,label])=>({value,label,danger:value==='delete'})),
         onSelect:action=>openAction(u,action)});
       headActions.append(actions);$('usersList').append(card);
@@ -43,14 +43,14 @@
   }
   async function load(preserveInteraction=false){
     if(busy)return;busy=true;
-    try{const d=await api();users=d.items;if(!preserveInteraction||(!FOX_PANELControls.isOpen()&&!document.activeElement?.closest('.user-actions')))render();$('usersError').hidden=true;$('usersEngine').textContent=d.storageError?'ذخیرهٔ مصرف ناموفق است؛ اتصال کاربران تا رفع مشکل متوقف شده.':d.engine.message;$('usersEngine').dataset.status=d.storageError?'error':d.engine.status;}
+    try{const d=await api();users=d.items;if(!preserveInteraction||(!FOXPANELControls.isOpen()&&!document.activeElement?.closest('.user-actions')))render();$('usersError').hidden=true;$('usersEngine').textContent=d.storageError?'ذخیرهٔ مصرف ناموفق است؛ اتصال کاربران تا رفع مشکل متوقف شده.':d.engine.message;$('usersEngine').dataset.status=d.storageError?'error':d.engine.status;}
     catch(e){$('usersError').textContent=e.message;$('usersError').hidden=false;}
     finally{busy=false;}
   }
   function openEditor(u=null){
     editing=u;$('userForm').reset();$('userFormError').hidden=true;$('userDialogTitle').textContent=u?'ویرایش '+u.name:'ساخت کاربر جدید';
     for(const key of ['name','note','limitGB','durationDays','resetDays','startMode'])$('user_'+key).value=u?.[key]??({limitGB:0,durationDays:0,resetDays:0,startMode:'now'}[key]??'');
-    FOX_PANELControls.sync($('user_startMode'));
+    FOXPANELControls.sync($('user_startMode'));
     $('user_enabled').checked=u?.enabled??true;
     document.querySelectorAll('[name="userProtocol"]').forEach(e=>e.checked=u?u.protocols.includes(e.value):true);
     $('userCurrentExpiry').textContent=u?'اعتبار فعلی: '+(u.expiresAt?date(u.expiresAt):u.durationDays?'در انتظار اولین اتصال':'نامحدود'):'';
@@ -110,6 +110,6 @@
   $('userImportDialog').addEventListener('close',()=>{if(!importBusy)clearImport();});
   const active=()=>$('viewUsers').classList.contains('active')&&document.visibilityState==='visible';
   window.addEventListener('hashchange',()=>{if(active())load();});window.addEventListener('amyrax-refresh',()=>{if(active())load();});
-  setInterval(()=>{if(active()&&!$('userDialog').open&&!$('userActionDialog').open&&!$('userImportDialog').open&&!FOX_PANELControls.isOpen()&&!document.activeElement?.closest('.am-dropdown'))load(true);},5000);
+  setInterval(()=>{if(active()&&!$('userDialog').open&&!$('userActionDialog').open&&!$('userImportDialog').open&&!FOXPANELControls.isOpen()&&!document.activeElement?.closest('.am-dropdown'))load(true);},5000);
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{if(active())load();});else if(active())load();
 })();

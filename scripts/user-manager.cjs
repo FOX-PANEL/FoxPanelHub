@@ -1,4 +1,4 @@
-function createUserManagement({ LinkGenerator, Logger, FOX_PANELTraffic }) {
+function createUserManagement({ LinkGenerator, Logger, FOXPANELTraffic }) {
   const fs = require('fs'), path = require('path'), crypto = require('crypto'), net = require('net');
   const { spawn, execFile } = require('child_process');
   const DAY = 86400000, GiB = 1073741824;

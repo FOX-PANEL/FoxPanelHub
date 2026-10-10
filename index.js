@@ -3384,7 +3384,7 @@ function subscriptionFormat(req) {
 }
 
 // BEGIN USER MANAGEMENT
-function createUserManagement({ LinkGenerator, Logger, FOX_PANELTraffic }) {
+function createUserManagement({ LinkGenerator, Logger, FOX_PANEL_Traffic }) {
   const fs = require('fs'), path = require('path'), crypto = require('crypto'), net = require('net');
   const { spawn, execFile } = require('child_process');
   const DAY = 86400000, GiB = 1073741824;
@@ -3894,7 +3894,7 @@ function createHttpPanel(config, stateManager, engineStatusGetter, resolvedHostG
   const workQueue = new WorkQueue();
   const panelPath = config.panelPath.replace(/^\//, '') || 'amyrax';
   app.use((req,res,next)=>UpgradeSupport.redirect(req,res,next,panelPath));
-  const UserManager = createUserManagement({ LinkGenerator, Logger, FOX_PANELTraffic });
+  const UserManager = createUserManagement({ LinkGenerator, Logger, FOX_PANEL_Traffic });
   const users = config.userManager || (config.userManager = new UserManager(config, stateManager));
 
   const AMYRAX_XHTTP_PATH = XrayEngine.xhttpPath();
@@ -4317,16 +4317,16 @@ function createHttpPanel(config, stateManager, engineStatusGetter, resolvedHostG
   app.get(`/${panelPath}/api/work-queue`, amyraxSessionOnly, (req,res) => {
     res.setHeader('Cache-Control','no-store'); res.json({ok:true,...workQueue.snapshot()});
   });
-  app.get(`/${panelPath}/api/traffic`, amyraxSessionOnly, (req, res) => { res.setHeader('Cache-Control', 'no-store'); return AssetManager.sendJson(req,res,{...FOX_PANELTraffic.snapshot(),system:{platform:amyraxPlatformName(),...systemMetrics.snapshot()}}); });
+  app.get(`/${panelPath}/api/traffic`, amyraxSessionOnly, (req, res) => { res.setHeader('Cache-Control', 'no-store'); return AssetManager.sendJson(req,res,{...FOX_PANEL_Traffic.snapshot(),system:{platform:amyraxPlatformName(),...systemMetrics.snapshot()}}); });
   app.post(`/${panelPath}/api/traffic/reset`, amyraxSessionOnly, amyraxSameOrigin, (req, res) => {
-    FOX_PANELTraffic.reset(); Logger.warn('Traffic counter reset from the panel.');
-    res.setHeader('Cache-Control', 'no-store'); res.json(FOX_PANELTraffic.snapshot());
+    FOX_PANEL_Traffic.reset(); Logger.warn('Traffic counter reset from the panel.');
+    res.setHeader('Cache-Control', 'no-store'); res.json(FOX_PANEL_Traffic.snapshot());
   });
   app.post(`/${panelPath}/api/traffic/baseline`, amyraxSessionOnly, amyraxSameOrigin, express.json({ limit: '2kb' }), (req, res) => {
     const gb = Number(req.body && req.body.gb);
     if (!isFinite(gb) || gb < 0 || gb > 1000000) return res.status(400).json({ ok: false, error: 'invalid value' });
-    FOX_PANELTraffic.setMonthUsedGB(gb); Logger.info(`Traffic: this month's used amount set to ${gb} GiB from the panel.`);
-    res.setHeader('Cache-Control', 'no-store'); res.json(FOX_PANELTraffic.snapshot());
+    FOX_PANEL_Traffic.setMonthUsedGB(gb); Logger.info(`Traffic: this month's used amount set to ${gb} GiB from the panel.`);
+    res.setHeader('Cache-Control', 'no-store'); res.json(FOX_PANEL_Traffic.snapshot());
   });
 
   const amyraxGhHeaders = () => Object.assign({ 'User-Agent': 'FOX_PANELPanel', Accept: 'application/vnd.github+json' },
@@ -4429,7 +4429,7 @@ function createHttpPanel(config, stateManager, engineStatusGetter, resolvedHostG
     const requestedClient = String(req.query.client || req.query.format || '').toLowerCase();
     const nodes = user && !users.permitted(user) ? [] : TransportSupport.forClient(generator.getAllNodes({ compat: format === 'base64' || format === 'raw' ? 'v2ray' : 'full', allowLocalHostLinks: true }), req.get('user-agent') || '', requestedClient);
     const url = subscriptionUrl(req);
-    const traffic = user ? users.traffic(user) : FOX_PANELTraffic.snapshot();
+    const traffic = user ? users.traffic(user) : FOX_PANEL_Traffic.snapshot();
     const title = user ? user.name : (config.subscriptionName || 'کاربر اصلی');
     const profileHeaders = {
       'Profile-Title': 'base64:' + Buffer.from(title).toString('base64'),
@@ -4676,10 +4676,10 @@ function createTrafficMeter({ Logger, platformName, now = Date.now, monotonic = 
 
 
 // END TRAFFIC METER
-const FOX_PANELTraffic = createTrafficMeter({ Logger, platformName: amyraxPlatformName });
+const FOX_PANEL_Traffic = createTrafficMeter({ Logger, platformName: amyraxPlatformName });
 
 // BEGIN TUNNEL GATEWAY
-function createTunnelGateway({ FOX_PANELTraffic }) {
+function createTunnelGateway({ FOX_PANEL_Traffic }) {
   const crypto = require('crypto'), net = require('net');
   const { Transform } = require('stream');
   const { WebSocketServer, createWebSocketStream } = require('ws');
@@ -4853,7 +4853,7 @@ function createTunnelGateway({ FOX_PANELTraffic }) {
         const allowed = target.shared ? chunk.length
           : user?.uuid === target.uuid && user.protocols.includes(target.protocol) ? manager.charge(target.id, direction, chunk.length) : 0;
         if (!allowed) { callback(new Error('Connection no longer permitted')); connection.close(); return; }
-        FOX_PANELTraffic.add(label, direction === 'up' ? allowed : 0, direction === 'down' ? allowed : 0);
+        FOX_PANEL_Traffic.add(label, direction === 'up' ? allowed : 0, direction === 'down' ? allowed : 0);
         callback(null, chunk.subarray(0, allowed));
         if (allowed < chunk.length) setImmediate(() => connection.close());
       } });
@@ -4866,7 +4866,7 @@ function createTunnelGateway({ FOX_PANELTraffic }) {
         if (closed) return;
         backend.setTimeout(0); backend.setNoDelay(true); backend.setKeepAlive(true, 10000);
         if (!this.target(target, target.protocol)) { connection.close(); return; }
-        done = FOX_PANELTraffic.open(label,target.shared ? 'shared' : target.id);
+        done = FOX_PANEL_Traffic.open(label,target.shared ? 'shared' : target.id);
         up.pipe(backend); backend.pipe(down).pipe(stream);
         up.write(initial); stream.pipe(up); stream.resume();
       });
@@ -4878,7 +4878,7 @@ function createTunnelGateway({ FOX_PANELTraffic }) {
 
 
 // END TUNNEL GATEWAY
-const TunnelGateway = createTunnelGateway({ FOX_PANELTraffic });
+const TunnelGateway = createTunnelGateway({ FOX_PANEL_Traffic });
 
 class TcpRouter {
   constructor(config, targetPorts, expressServer, expressApp) {
@@ -4903,8 +4903,8 @@ class TcpRouter {
       backend.setNoDelay(true);
       backend.write(firstChunk);
       if (!label.startsWith('Internal-')) {
-        FOX_PANELTraffic.add(label, firstChunk ? firstChunk.length : 0, 0);
-        FOX_PANELTraffic.meter(label, clientSocket, backend);
+        FOX_PANEL_Traffic.add(label, firstChunk ? firstChunk.length : 0, 0);
+        FOX_PANEL_Traffic.meter(label, clientSocket, backend);
       }
       clientSocket.pipe(backend);
       backend.pipe(clientSocket);
@@ -5078,7 +5078,7 @@ async function startPanel(userConfig = {}) {
     }
   }
 
-  FOX_PANELTraffic.init(config.paths.dataDir);
+  FOX_PANEL_Traffic.init(config.paths.dataDir);
 
   const stateMgr = new StateManager(config.paths, config);
   const state = stateMgr.loadOrCreate();
@@ -5164,7 +5164,7 @@ async function startPanel(userConfig = {}) {
     if (argoInstance) argoInstance.stop();
     if (tcpRouter) tcpRouter.stop();
     config.userManager?.stop();
-    try { FOX_PANELTraffic.save(); } catch (_) {}
+    try { FOX_PANEL_Traffic.save(); } catch (_) {}
     process.exit(code === AMYRAX_RESTART_CODE ? AMYRAX_RESTART_CODE : 0);
   };
 

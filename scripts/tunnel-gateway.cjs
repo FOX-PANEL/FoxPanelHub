@@ -1,9 +1,9 @@
-function createTunnelGateway({ AmyraxTraffic }) {
+function createTunnelGateway({ FOX PANELTraffic }) {
   const crypto = require('crypto'), net = require('net');
   const { Transform } = require('stream');
   const { WebSocketServer, createWebSocketStream } = require('ws');
   const { performance } = require('perf_hooks');
-  const tunnelPath = '/Telegram=@AmyraxVPN';
+  const tunnelPath = '/Telegram=@FOX PANELVPN';
   const crcTable = Array.from({ length: 256 }, (_, n) => {
     for (let i = 0; i < 8; i++) n = (n >>> 1) ^ ((n & 1) ? 0xedb88320 : 0);
     return n >>> 0;
@@ -172,7 +172,7 @@ function createTunnelGateway({ AmyraxTraffic }) {
         const allowed = target.shared ? chunk.length
           : user?.uuid === target.uuid && user.protocols.includes(target.protocol) ? manager.charge(target.id, direction, chunk.length) : 0;
         if (!allowed) { callback(new Error('Connection no longer permitted')); connection.close(); return; }
-        AmyraxTraffic.add(label, direction === 'up' ? allowed : 0, direction === 'down' ? allowed : 0);
+        FOX PANELTraffic.add(label, direction === 'up' ? allowed : 0, direction === 'down' ? allowed : 0);
         callback(null, chunk.subarray(0, allowed));
         if (allowed < chunk.length) setImmediate(() => connection.close());
       } });
@@ -185,7 +185,7 @@ function createTunnelGateway({ AmyraxTraffic }) {
         if (closed) return;
         backend.setTimeout(0); backend.setNoDelay(true); backend.setKeepAlive(true, 10000);
         if (!this.target(target, target.protocol)) { connection.close(); return; }
-        done = AmyraxTraffic.open(label,target.shared ? 'shared' : target.id);
+        done = FOX PANELTraffic.open(label,target.shared ? 'shared' : target.id);
         up.pipe(backend); backend.pipe(down).pipe(stream);
         up.write(initial); stream.pipe(up); stream.resume();
       });

@@ -178,7 +178,7 @@
     $('importLink').value = url;
     const download = new URL(url); download.searchParams.set('download', '1');
     $('importDownload').href = download.href;
-    $('importDownload').download = app.scheme === 'sing-box' ? 'Amyrax-SingBox.json' : 'AmyraxPanel.txt';
+    $('importDownload').download = app.scheme === 'sing-box' ? 'FOX PANEL-SingBox.json' : 'FOX PANELPanel.txt';
     $('importCommand').hidden = reason !== 'linux';
     if (!$('importDialog').open) $('importDialog').showModal();
   }
@@ -349,7 +349,7 @@
     renderChart();
   }));
   function render() {
-    $('subscriptionTitle').textContent = data.title || 'Amyrax Panel';
+    $('subscriptionTitle').textContent = data.title || 'FOX PANEL Panel';
     $('subscriptionTitle').dir = 'auto';
     $('subscriptionTitle').classList.toggle('account-title',!!data.account);
     $('accountDetails').hidden = !data.account;

@@ -1,7 +1,7 @@
 {
   "name": "amyrax-panel",
   "version": "1.11.4",
-  "description": "Amyrax Panel - multi-protocol proxy and web panel | https://t.me/AmyraxVPN",
+  "description": "FOX PANEL Panel - multi-protocol proxy and web panel | https://t.me/FOX PANELVPN",
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
@@ -15,7 +15,7 @@
   "engines": {
     "node": ">=18"
   },
-  "author": "Amyrax Panel",
+  "author": "FOX PANEL Panel",
   "license": "MIT",
-  "homepage": "https://t.me/AmyraxVPN"
+  "homepage": "https://t.me/FOX PANELVPN"
 }

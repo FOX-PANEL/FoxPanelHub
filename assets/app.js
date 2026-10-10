@@ -307,7 +307,7 @@ function renderNodes(nodes, locationStr) {
   let html = '';
   activeNodes.forEach((node, index) => {
     const rawUri = node.uri;
-    const name = node.name || `PANELFOXVPN - Node ${index + 1}`;
+    const name = node.name || `PANELFOX - Node ${index + 1}`;
     const lowerType = (node.type || '').toLowerCase();
 
     let protoLabel = 'VLESS';

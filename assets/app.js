@@ -1,4 +1,4 @@
-async function amyraxRequestJson(url, options = {}) {
+async function foxpanelRequestJson(url, options = {}) {
   const { timeoutMs = 20000, signal, ...settings } = options;
   const method = String(settings.method || 'GET').toUpperCase(), readOnly = method === 'GET';
   const controller = new AbortController();
@@ -48,7 +48,7 @@ async function amyraxRequestJson(url, options = {}) {
 let panelData = null;
 
 function showToast(text) {
-  const toast = document.getElementById('amyraxToast');
+  const toast = document.getElementById('foxpanelToast');
   if (!toast) return;
   toast.innerText = text;
   toast.classList.add('show');
@@ -150,7 +150,7 @@ function applyTheme(theme) {
 
 function initTheme() {
   let savedTheme = 'dark';
-  try { savedTheme = localStorage.getItem('amyrax-theme') || 'dark'; } catch {}
+  try { savedTheme = localStorage.getItem('foxpanel-theme') || 'dark'; } catch {}
   applyTheme(savedTheme);
 }
 
@@ -159,7 +159,7 @@ function toggleTheme() {
   const nextTheme = (current === 'cozy') ? 'dark' : 'cozy';
   applyTheme(nextTheme);
   try {
-    localStorage.setItem('amyrax-theme', nextTheme);
+    localStorage.setItem('foxpanel-theme', nextTheme);
   } catch {}
   showToast(nextTheme === 'cozy' ? 'تم گرم فعال شد.' : 'تم تیره فعال شد.');
 }
@@ -230,7 +230,7 @@ function handleRouting() {
     }
   });
 
-  amyraxPageTitle(validPage);
+  foxpanelPageTitle(validPage);
   toggleDrawer(false);
   window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -384,7 +384,7 @@ function renderNodes(nodes, locationStr) {
             <button type="button" class="action-icon-button" data-action="copy-text" data-text="${encodedUri}" aria-label="کپی ${escapeHtml(node.name || node.type)}" title="کپی لینک"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg></button>
           </span>
           ${node.wgConf ? `
-            <a href="/amyrax/wg.conf" download="wg0.conf" class="btn-node-dl" title="Download WireGuard Profile">
+            <a href="/foxpanel/wg.conf" download="wg0.conf" class="btn-node-dl" title="Download WireGuard Profile">
               <span>.conf</span>
             </a>
           ` : ''}
@@ -399,9 +399,9 @@ function renderNodes(nodes, locationStr) {
 async function loadGateData() {
   try {
     const pathSegments = window.location.pathname.split('/').filter(Boolean);
-    const pathPrefix = pathSegments[0] || 'amyrax';
+    const pathPrefix = pathSegments[0] || 'foxpanel';
 
-    const data = await amyraxRequestJson('/health');
+    const data = await foxpanelRequestJson('/health');
     panelData = data;
     updateFOX PANELOverview(data);
 
@@ -409,7 +409,7 @@ async function loadGateData() {
     const serverHost = data.domain || data.host || window.location.hostname;
     const locationStr = data.location || 'Global Server';
 
-    const uptimeStr = amyraxDuration(data.uptime);
+    const uptimeStr = foxpanelDuration(data.uptime);
 
     const homeLocation = document.getElementById('homeLocation');
     if (homeLocation) homeLocation.innerText = locationStr;
@@ -470,18 +470,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
 (function () {
   const $=id=>document.getElementById(id);
-  const prefix='/' + (location.pathname.split('/').filter(Boolean)[0] || 'amyrax');
+  const prefix='/' + (location.pathname.split('/').filter(Boolean)[0] || 'foxpanel');
   const names={'VLESS-WS':'VLESS WS','VMess-WS':'VMess WS','Trojan-WS':'Trojan WS','Shadowsocks-WS':'Shadowsocks WS','VMess-HTTPUpgrade':'VMess HTTPUpgrade','Trojan-HTTPUpgrade':'Trojan HTTPUpgrade','VLESS-gRPC':'VLESS gRPC','VLESS-XHTTP':'VLESS XHTTP','VLESS-HTTPUpgrade':'VLESS HTTPUpgrade',Other:'سایر'};
   const total=e=>(e?.up||0)+(e?.down||0);
   let loading=false,lastStamp=0;
   function render(d){
     if(!d?.ok || !d.live)return;
     const stamp=Date.parse(d.now);if(stamp<lastStamp)return;lastStamp=stamp;
-    amyraxTraffic(d);updateFOX PANELResources(d.system);
-    for(const [id,value] of Object.entries({usageLiveUp:d.live.upBps,usageLiveDown:d.live.downBps,usageDayTotal:d.day.total,usageDayUp:d.day.up,usageDayDown:d.day.down,usageMonthTotal:d.month.used,usageMonthUp:d.month.up,usageMonthDown:d.month.down,usageAllTotal:d.allTime.total,usageAllUp:d.allTime.up,usageAllDown:d.allTime.down}))amyraxValue(id,value,id.startsWith('usageLive'));
-    amyraxSet('usageMonthKey','('+d.month.key+')');
+    foxpanelTraffic(d);updateFOX PANELResources(d.system);
+    for(const [id,value] of Object.entries({usageLiveUp:d.live.upBps,usageLiveDown:d.live.downBps,usageDayTotal:d.day.total,usageDayUp:d.day.up,usageDayDown:d.day.down,usageMonthTotal:d.month.used,usageMonthUp:d.month.up,usageMonthDown:d.month.down,usageAllTotal:d.allTime.total,usageAllUp:d.allTime.up,usageAllDown:d.allTime.down}))foxpanelValue(id,value,id.startsWith('usageLive'));
+    foxpanelSet('usageMonthKey','('+d.month.key+')');
     const rows=document.createDocumentFragment();
-    const cell=(row,value,bytes=false)=>{const td=document.createElement('td');td.textContent=bytes?amyraxBytes(value):value;if(bytes)td.title=Number(value).toLocaleString('en-US')+' bytes';row.append(td);};
+    const cell=(row,value,bytes=false)=>{const td=document.createElement('td');td.textContent=bytes?foxpanelBytes(value):value;if(bytes)td.title=Number(value).toLocaleString('en-US')+' bytes';row.append(td);};
     for(const k of d.keys.filter(k=>['VLESS-WS','VMess-WS'].includes(k)||total(d.allTime.per[k])>0||d.active[k]>0)){
       const tr=document.createElement('tr'),m=d.month.per[k]||{};
       cell(tr,names[k]||k);cell(tr,d.active[k]||0);
@@ -496,38 +496,38 @@ document.addEventListener('DOMContentLoaded', () => {
     const box=$('usageLimit');box.hidden=!d.limit;
     if(d.limit){
       const pct=Math.max(0,d.limit.pct);box.classList.toggle('is-warn',pct>=80);box.classList.toggle('is-over',pct>=100);
-      amyraxSet('usageLimitText',amyraxBytes(d.limit.used)+' / '+amyraxBytes(d.limit.bytes));amyraxSet('usageLimitPct',pct.toFixed(1)+'%');
-      $('usageBar').style.width=Math.min(100,pct)+'%';amyraxSet('usageLimitMsg','باقی‌مانده: '+amyraxBytes(d.limit.remaining));
+      foxpanelSet('usageLimitText',foxpanelBytes(d.limit.used)+' / '+foxpanelBytes(d.limit.bytes));foxpanelSet('usageLimitPct',pct.toFixed(1)+'%');
+      $('usageBar').style.width=Math.min(100,pct)+'%';foxpanelSet('usageLimitMsg','باقی‌مانده: '+foxpanelBytes(d.limit.remaining));
     }
     document.querySelectorAll('[data-page="usage"]').forEach(a=>{
       let dot=a.querySelector('.usage-nav-dot');
       if(d.limit?.pct>=80){if(!dot){dot=document.createElement('span');dot.className='usage-nav-dot';a.append(dot);}dot.classList.toggle('over',d.limit.pct>=100);}else dot?.remove();
     });
-    amyraxSet('trafficUpdated','به‌روز: '+new Date(d.now).toLocaleTimeString('fa-IR'));
+    foxpanelSet('trafficUpdated','به‌روز: '+new Date(d.now).toLocaleTimeString('fa-IR'));
   }
   async function load(){
     if(loading)return;loading=true;
-    try{render(await amyraxRequestJson(prefix+'/api/traffic',{timeoutMs:6000}));}
-    catch(_){for(const id of ['usageLiveUp','usageLiveDown','overviewUp','overviewDown'])amyraxSet(id,'—');amyraxSet('trafficUpdated','دریافت آمار ناموفق؛ اعداد قبلی به‌روز نیستند.');}
+    try{render(await foxpanelRequestJson(prefix+'/api/traffic',{timeoutMs:6000}));}
+    catch(_){for(const id of ['usageLiveUp','usageLiveDown','overviewUp','overviewDown'])foxpanelSet(id,'—');foxpanelSet('trafficUpdated','دریافت آمار ناموفق؛ اعداد قبلی به‌روز نیستند.');}
     finally{loading=false;}
   }
   const active=()=>document.visibilityState==='visible'&&($('viewHome')?.classList.contains('active')||$('viewUsage')?.classList.contains('active'));
   setInterval(()=>{if(active())load();},2000);
   window.addEventListener('hashchange',()=>{if(active())load();});
   document.addEventListener('visibilitychange',()=>{if(active())load();});
-  window.addEventListener('amyrax-refresh',load);
+  window.addEventListener('foxpanel-refresh',load);
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',load);else load();
 })();
 
 (function () {
   const btn = document.getElementById('updateBtn');
   if (!btn) return;
-  const API = '/' + (window.location.pathname.split('/').filter(Boolean)[0] || 'amyrax') + '/api/update';
+  const API = '/' + (window.location.pathname.split('/').filter(Boolean)[0] || 'foxpanel') + '/api/update';
   let info = null;
   async function call(method) {
     btn.classList.add('busy');
     try {
-      return await amyraxRequestJson(API, { method, headers: { 'X-FOX PANEL-Req': '1' } });
+      return await foxpanelRequestJson(API, { method, headers: { 'X-FOX PANEL-Req': '1' } });
     } finally { btn.classList.remove('busy'); }
   }
   async function check(quiet) {
@@ -554,7 +554,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const until = Date.now() + 5 * 60000;
     const poll = async () => {
       try {
-        const d = await amyraxRequestJson(API);
+        const d = await foxpanelRequestJson(API);
         if (!d.newer) return location.reload();
       } catch (_) {}
       if (Date.now() < until) setTimeout(poll, 4000); else location.reload();
@@ -565,33 +565,33 @@ document.addEventListener('DOMContentLoaded', () => {
   check(true);
 })();
 
-const amyraxSet = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
-function amyraxBytes(value, speed = false) {
+const foxpanelSet = (id, value) => { const el = document.getElementById(id); if (el) el.textContent = value; };
+function foxpanelBytes(value, speed = false) {
   if(value===null||value===undefined||!Number.isFinite(Number(value)))return '—';
   let n=Math.abs(Number(value)),i=0;const units=['B','KiB','MiB','GiB','TiB'];
   while(n>=1024&&i<units.length-1){n/=1024;i++;}
   return (Number(value)<0?'-':'')+n.toLocaleString('en-US',{maximumFractionDigits:i?2:0})+' '+units[i]+(speed?'/s':'');
 }
-function amyraxValue(id,value,speed=false){
-  amyraxSet(id,amyraxBytes(value,speed));const e=document.getElementById(id);
+function foxpanelValue(id,value,speed=false){
+  foxpanelSet(id,foxpanelBytes(value,speed));const e=document.getElementById(id);
   if(e)e.title=value!==null&&value!==undefined&&Number.isFinite(Number(value))?Number(value).toLocaleString('en-US',{maximumFractionDigits:2})+' bytes'+(speed?'/s':''):'';
 }
-function amyraxDuration(seconds) {
+function foxpanelDuration(seconds) {
   if(seconds===null||seconds===undefined||!Number.isFinite(Number(seconds)))return '—';
   const s=Math.max(0,Math.floor(seconds)),d=Math.floor(s/86400),h=Math.floor(s%86400/3600),m=Math.floor(s%3600/60);
   return (d?d+'d ':'')+(h?h+'h ':'')+m+'m '+(s%60)+'s';
 }
-let amyraxResourceStamp=0;
+let foxpanelResourceStamp=0;
 function updateFOX PANELResources(system){
-  if(!system||system.sampledAt<amyraxResourceStamp)return;amyraxResourceStamp=system.sampledAt;
+  if(!system||system.sampledAt<foxpanelResourceStamp)return;foxpanelResourceStamp=system.sampledAt;
   const memory=system.memory||{};
-  amyraxSet('overviewCores',system.cores??'—');amyraxSet('homeUptime',amyraxDuration(system.panelUptime));
-  amyraxSet('systemUptime',amyraxDuration(system.uptime));amyraxSet('systemUptimeLabel',system.uptimeScope==='container'?'فعالیت محیط اجرا':'فعالیت میزبان');
-  amyraxSet('memoryScope',memory.scope==='host'?'حافظهٔ میزبان':'حافظهٔ محیط اجرا');
-  amyraxValue('processMemory',system.processRss);amyraxValue('memoryUsed',memory.used);
-  amyraxSet('memoryTotal',memory.total?'/ '+amyraxBytes(memory.total):'سقف در دسترس نیست');
+  foxpanelSet('overviewCores',system.cores??'—');foxpanelSet('homeUptime',foxpanelDuration(system.panelUptime));
+  foxpanelSet('systemUptime',foxpanelDuration(system.uptime));foxpanelSet('systemUptimeLabel',system.uptimeScope==='container'?'فعالیت محیط اجرا':'فعالیت میزبان');
+  foxpanelSet('memoryScope',memory.scope==='host'?'حافظهٔ میزبان':'حافظهٔ محیط اجرا');
+  foxpanelValue('processMemory',system.processRss);foxpanelValue('memoryUsed',memory.used);
+  foxpanelSet('memoryTotal',memory.total?'/ '+foxpanelBytes(memory.total):'سقف در دسترس نیست');
   const pct=memory.total>0&&memory.used!==null?memory.used/memory.total*100:null;
-  amyraxSet('memoryPercent',pct===null?'—':pct.toFixed(0)+'%');
+  foxpanelSet('memoryPercent',pct===null?'—':pct.toFixed(0)+'%');
   document.getElementById('memoryRing')?.style.setProperty('--pct',pct===null?0:Math.min(100,Math.max(0,pct)));
 }
 function updateFOX PANELOverview(data) {
@@ -599,13 +599,13 @@ function updateFOX PANELOverview(data) {
   const system = data.system || {}, memory = system.memory || {};
   const enabled = data.enabled || {}, engines = data.engines || {};
   const nodes = (data.nodes || []).filter(n => n && n.uri);
-  amyraxSet('overviewHost', data.domain || data.host || '—');
-  amyraxSet('serverPlatform', system.os || '—');
-  amyraxSet('overviewPlatform', system.platform || '—');
-  amyraxSet('homeLocation', data.location || '—');
-  amyraxSet('homePort', data.publicPort || '—');
-  amyraxSet('statUptime', amyraxDuration(data.uptime));
-  amyraxSet('overviewNodes', nodes.length);
+  foxpanelSet('overviewHost', data.domain || data.host || '—');
+  foxpanelSet('serverPlatform', system.os || '—');
+  foxpanelSet('overviewPlatform', system.platform || '—');
+  foxpanelSet('homeLocation', data.location || '—');
+  foxpanelSet('homePort', data.publicPort || '—');
+  foxpanelSet('statUptime', foxpanelDuration(data.uptime));
+  foxpanelSet('overviewNodes', nodes.length);
   updateFOX PANELResources(system);
   updateFOX PANELWorkQueue(data.workQueue);
   const singEnabled = Object.entries(enabled).some(([key, val]) => val && !['argo', 'vlessXhttp'].includes(key));
@@ -614,12 +614,12 @@ function updateFOX PANELOverview(data) {
     if (el) { el.textContent = running ? 'در حال اجرا' : configured ? 'متوقف' : 'غیرفعال'; el.classList.toggle('running', !!running); }
   });
   const active = Object.values(engines).filter(Boolean).length;
-  amyraxSet('engineCount', active + ' / 3 فعال');
-  amyraxSet('statEngines', active ? Object.keys(engines).filter(key => engines[key]).join(' + ') : 'موتور فعالی نیست');
-  amyraxSet('connectionLabel', active ? 'سرویس فعال' : 'پنل در دسترس');
+  foxpanelSet('engineCount', active + ' / 3 فعال');
+  foxpanelSet('statEngines', active ? Object.keys(engines).filter(key => engines[key]).join(' + ') : 'موتور فعالی نیست');
+  foxpanelSet('connectionLabel', active ? 'سرویس فعال' : 'پنل در دسترس');
   document.getElementById('connectionState')?.classList.remove('offline');
   document.getElementById('serverIndicator')?.style.setProperty('background', 'var(--primary-red)');
-  amyraxSet('overviewUpdated', 'آخرین دریافت: ' + new Date().toLocaleTimeString('fa-IR', {hour: '2-digit', minute: '2-digit'}));
+  foxpanelSet('overviewUpdated', 'آخرین دریافت: ' + new Date().toLocaleTimeString('fa-IR', {hour: '2-digit', minute: '2-digit'}));
   const grouped = new Map();
   for (const node of nodes) {
     const type = String(node.type || 'OTHER').replace(/-/g, ' ').toUpperCase();
@@ -637,14 +637,14 @@ function updateFOX PANELOverview(data) {
     }
     if (!grouped.size) { const message = document.createElement('p'); message.className = 'muted'; message.textContent = 'کانفیگی در دسترس نیست.'; protocolGrid.append(message); }
   }
-  amyraxSet('protocolCount', grouped.size + ' نوع اتصال');
+  foxpanelSet('protocolCount', grouped.size + ' نوع اتصال');
 }
-function amyraxTraffic(data) {
+function foxpanelTraffic(data) {
   if(!data?.ok||!data.live)return;
-  amyraxValue('overviewUp',data.live.upBps,true);amyraxValue('overviewDown',data.live.downBps,true);
-  amyraxValue('overviewSent',data.day.up);amyraxValue('overviewReceived',data.day.down);amyraxValue('overviewMonth',data.month.used);
-  amyraxSet('overviewConnections',data.connections?.accounts??'—');
-  amyraxSet('overviewTunnels',(data.connections?.tunnels??0)+' تونل باز');
+  foxpanelValue('overviewUp',data.live.upBps,true);foxpanelValue('overviewDown',data.live.downBps,true);
+  foxpanelValue('overviewSent',data.day.up);foxpanelValue('overviewReceived',data.day.down);foxpanelValue('overviewMonth',data.month.used);
+  foxpanelSet('overviewConnections',data.connections?.accounts??'—');
+  foxpanelSet('overviewTunnels',(data.connections?.tunnels??0)+' تونل باز');
   const points=data.live.samples||[],latest=points.at(-1)?.t||Date.parse(data.now),start=latest-60000;
   const visible=points.filter(p=>p.t>=start),peak=Math.max(1,...visible.flatMap(p=>[p.upBps,p.downBps]));
   const line=key=>visible.map((p,i)=>((i===0||p.t-visible[i-1].t>3500)?'M':'L')+Math.max(0,(p.t-start)*500/60000).toFixed(1)+','+(100-p[key]/peak*90).toFixed(1)).join(' ');
@@ -652,7 +652,7 @@ function amyraxTraffic(data) {
   document.getElementById('chartArea')?.setAttribute('d','');
   const empty=document.getElementById('chartEmpty');if(empty)empty.hidden=visible.some(p=>p.upBps>0||p.downBps>0);
 }
-function amyraxPageTitle(page) {
+function foxpanelPageTitle(page) {
   const pages = {
     home: ['نمای کلی پنل', 'وضعیت اتصال، سرویس‌ها و مصرف ترافیک؛ همه در یک نگاه.', 'نمای کلی'],
     subs: ['لینک‌های اشتراک', 'یک لینک برای وارد کردن همهٔ کانفیگ‌ها در برنامهٔ دلخواه شما.', 'اشتراک‌ها'],
@@ -661,49 +661,49 @@ function amyraxPageTitle(page) {
     usage: ['مصرف ترافیک', 'مصرف امروز، این ماه و جزئیات ترافیک هر پروتکل را دنبال کنید.', 'ترافیک']
   };
   const [title, description, breadcrumb] = pages[page] || pages.home;
-  amyraxSet('pageTitle', title); amyraxSet('pageDescription', description); amyraxSet('breadcrumbPage', breadcrumb);
+  foxpanelSet('pageTitle', title); foxpanelSet('pageDescription', description); foxpanelSet('breadcrumbPage', breadcrumb);
   document.querySelectorAll('.nav-link,.mob-link').forEach(link => {
     if (link.dataset.page === page) link.setAttribute('aria-current', 'page'); else link.removeAttribute('aria-current');
   });
 }
-async function amyraxRefresh() {
+async function foxpanelRefresh() {
   const button = document.getElementById('refreshOverview');
   if (button) { button.disabled = true; button.classList.add('busy'); }
   try {
-    const data = await amyraxRequestJson('/health');
+    const data = await foxpanelRequestJson('/health');
     updateFOX PANELOverview(data);
     renderNodes(data.nodes, data.location);
   } catch (error) {
-    if (error.status === 401) { window.location.assign('/' + (location.pathname.split('/').filter(Boolean)[0] || 'amyrax') + '/login'); return; }
-    if (error.status === 503) { amyraxSet('overviewUpdated', 'سرور مشغول است؛ چند ثانیه بعد دوباره تلاش کنید.'); return; }
-    amyraxSet('connectionLabel', 'ارتباط قطع است');
+    if (error.status === 401) { window.location.assign('/' + (location.pathname.split('/').filter(Boolean)[0] || 'foxpanel') + '/login'); return; }
+    if (error.status === 503) { foxpanelSet('overviewUpdated', 'سرور مشغول است؛ چند ثانیه بعد دوباره تلاش کنید.'); return; }
+    foxpanelSet('connectionLabel', 'ارتباط قطع است');
     document.getElementById('connectionState')?.classList.add('offline');
-    amyraxSet('overviewUpdated', 'دریافت وضعیت ناموفق بود؛ دوباره تلاش کنید.');
+    foxpanelSet('overviewUpdated', 'دریافت وضعیت ناموفق بود؛ دوباره تلاش کنید.');
   } finally { if (button) { button.disabled = false; button.classList.remove('busy'); } }
 }
-document.getElementById('refreshOverview')?.addEventListener('click', async () => { await amyraxRefresh(); window.dispatchEvent(new Event('amyrax-refresh')); });
+document.getElementById('refreshOverview')?.addEventListener('click', async () => { await foxpanelRefresh(); window.dispatchEvent(new Event('foxpanel-refresh')); });
 document.getElementById('drawerScrim')?.addEventListener('click', () => toggleDrawer(false));
-setInterval(() => { if (document.visibilityState === 'visible' && document.getElementById('viewHome')?.classList.contains('active')) amyraxRefresh(); }, 15000);
+setInterval(() => { if (document.visibilityState === 'visible' && document.getElementById('viewHome')?.classList.contains('active')) foxpanelRefresh(); }, 15000);
 
 function updateFOX PANELWorkQueue(data) {
   if (!data) return;
   const fa = new Intl.NumberFormat('fa-IR');
-  amyraxSet('workQueueState', {normal:'فعال',busy:'کاهش ظرفیت',paused:'انتظار حافظه'}[data.pressure] || '—');
-  amyraxSet('workQueueActive', fa.format(data.active) + ' / ' + fa.format(data.capacity));
-  amyraxSet('workQueuePending', fa.format(data.pending) + ' / ' + fa.format(data.maxQueued));
+  foxpanelSet('workQueueState', {normal:'فعال',busy:'کاهش ظرفیت',paused:'انتظار حافظه'}[data.pressure] || '—');
+  foxpanelSet('workQueueActive', fa.format(data.active) + ' / ' + fa.format(data.capacity));
+  foxpanelSet('workQueuePending', fa.format(data.pending) + ' / ' + fa.format(data.maxQueued));
 }
-let amyraxQueueLoading = false;
+let foxpanelQueueLoading = false;
 async function refreshFOX PANELWorkQueue() {
-  if (amyraxQueueLoading || document.visibilityState !== 'visible' || !document.getElementById('viewHome')?.classList.contains('active')) return;
-  amyraxQueueLoading = true;
+  if (foxpanelQueueLoading || document.visibilityState !== 'visible' || !document.getElementById('viewHome')?.classList.contains('active')) return;
+  foxpanelQueueLoading = true;
   try {
-    const base = '/' + (location.pathname.split('/').filter(Boolean)[0] || 'amyrax');
-    updateFOX PANELWorkQueue(await amyraxRequestJson(base + '/api/work-queue',{timeoutMs:5000}));
-  } catch (_) { amyraxSet('workQueueState','وضعیت در دسترس نیست'); }
-  finally {amyraxQueueLoading = false;}
+    const base = '/' + (location.pathname.split('/').filter(Boolean)[0] || 'foxpanel');
+    updateFOX PANELWorkQueue(await foxpanelRequestJson(base + '/api/work-queue',{timeoutMs:5000}));
+  } catch (_) { foxpanelSet('workQueueState','وضعیت در دسترس نیست'); }
+  finally {foxpanelQueueLoading = false;}
 }
 setInterval(refreshFOX PANELWorkQueue,5000);
-window.addEventListener('amyrax-refresh',refreshFOX PANELWorkQueue);
+window.addEventListener('foxpanel-refresh',refreshFOX PANELWorkQueue);
 window.addEventListener('hashchange',refreshFOX PANELWorkQueue);
 
 window.addEventListener("resize", () => toggleDrawer(false));

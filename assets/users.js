@@ -1,12 +1,12 @@
 (() => {
-  const $=id=>document.getElementById(id), base='/' + (location.pathname.split('/').filter(Boolean)[0] || 'amyrax') + '/api/users';
+  const $=id=>document.getElementById(id), base='/' + (location.pathname.split('/').filter(Boolean)[0] || 'foxpanel') + '/api/users';
   const statuses={active:'فعال',pending:'در انتظار اولین اتصال',disabled:'غیرفعال',expired:'منقضی',limited:'حجم تمام‌شده',archived:'بایگانی'};
   const fa=new Intl.NumberFormat('fa-IR');let users=[],editing=null,busy=false,currentAction=null;
   const node=(tag,cls,value)=>{const e=document.createElement(tag);if(cls)e.className=cls;if(value!==undefined)e.textContent=value;return e;};
-  const bytes=n=>amyraxBytes(n);
+  const bytes=n=>foxpanelBytes(n);
   const date=n=>n?new Date(n).toLocaleString('fa-IR',{dateStyle:'medium',timeStyle:'short'}):'—';
   async function api(path='',method='GET',body){
-    const data=await amyraxRequestJson(base+path,{method,headers:method==='GET'?{}:{'Content-Type':'application/json','X-FOX PANEL-Req':'1'},...(body?{body:JSON.stringify(body)}:{})});
+    const data=await foxpanelRequestJson(base+path,{method,headers:method==='GET'?{}:{'Content-Type':'application/json','X-FOX PANEL-Req':'1'},...(body?{body:JSON.stringify(body)}:{})});
     if(!data.ok)throw new Error(data.error||'دریافت اطلاعات ناموفق بود.');return data;
   }
   function render(){
@@ -109,7 +109,7 @@
   $('userImportDialog').addEventListener('cancel',e=>{if(importBusy)e.preventDefault();});
   $('userImportDialog').addEventListener('close',()=>{if(!importBusy)clearImport();});
   const active=()=>$('viewUsers').classList.contains('active')&&document.visibilityState==='visible';
-  window.addEventListener('hashchange',()=>{if(active())load();});window.addEventListener('amyrax-refresh',()=>{if(active())load();});
+  window.addEventListener('hashchange',()=>{if(active())load();});window.addEventListener('foxpanel-refresh',()=>{if(active())load();});
   setInterval(()=>{if(active()&&!$('userDialog').open&&!$('userActionDialog').open&&!$('userImportDialog').open&&!FOX PANELControls.isOpen()&&!document.activeElement?.closest('.am-dropdown'))load(true);},5000);
   if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',()=>{if(active())load();});else if(active())load();
 })();
